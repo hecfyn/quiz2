@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+    <br>
+    <h1>Quiz Time!</h1>
+    <p> Score:{{ score }}</p>
+    <form action="#" method="post">
+        <div class="question">
+            <p>{{ question['question'] }}</p>
+                    
+            {% for option in question['options'] %}
+                <input type="radio" name="{{ question['correct_answer'] }}" value="{{ option }}"> {{ option }}<br>
+            {% endfor %}
+                    
+        </div>
+        <input type="hidden" id="correct" name="correct" value="{{ question['correct_answer'] }}">
+
+        <input type="submit" value="Submit">
+    </form>
+
+{% endblock %}

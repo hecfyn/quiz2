@@ -1,0 +1,10 @@
+pip install flask-wtf
+pip install flask-sqlalchemy
+
+
+------
+
+python
+from app import db
+db.create_all()
+exit()

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+	<h1>Update User</h1><br/>
+	<div class="shadow p-3 mb-5 bg-body rounded">
+
+		<form method="POST">
+			{{ form.hidden_tag() }}
+
+			{{ form.email.label(class="form-label") }}
+			{{ form.email(class="form-control", value= name_to_update.email) }}
+			<br/>
+
+			{{ form.pw.label(class="form-label") }}
+			{{ form.pw(class="form-control", value= name_to_update.pw) }}
+			<br/>
+
+			{{ form.submit(class="btn btn-secondary") }}
+
+		</form>
+
+	</div>
+
+
+
+{% endblock %}
