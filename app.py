@@ -15,33 +15,7 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
 
-questions = {
-       1: {
-            'question': 'Ποιος ήταν ο πρώτος άνθρωπος που περπάτησε στη Σελήνη;',
-            'options': ['Α) Neil Armstrong', 'Β) Yuri Gagarin', 'Γ) Buzz Aldrin', 'Δ) Michael Collins'],
-            'correct_answer': 'Α'
-        },
-        2: {
-            'question': 'Ποια πόλη είναι η πρωτεύουσα της Ιταλίας;',
-            'options': ['Α) Βαρκελώνη', 'Β) Παρίσι', 'Γ) Ρώμη', 'Δ) Βιέννη'],
-            'correct_answer': 'Γ'
-        },
-        3: {
-            'question': 'Ποιος ζωγράφος δημιούργησε τον πίνακα "Η Μονάλιζα";',
-            'options': ['Α) Vincent van Gogh', 'Β) Pablo Picasso', 'Γ) Leonardo da Vinci', 'Δ) Claude Monet'],
-            'correct_answer': 'Γ'
-        },
-        4: {
-            'question': 'Ποιος είναι ο μεγαλύτερος ποταμός στον κόσμο;',
-            'options': ['Α) Νείλος', 'Β) Άμαζονας', 'Γ) Γάγγης', 'Δ) Μισισιπής'],
-            'correct_answer': 'Β'
-        },
-        5: {
-            'question': 'Ποιος συγγραφέας έγραψε το βιβλίο "Ο Άρχοντας των Δαχτυλιδιών";',
-            'options': ['Α) J.K. Rowling', 'Β) George R.R. Martin', 'Γ) J.R.R. Tolkien', 'Δ) C.S. Lewis'],
-            'correct_answer': 'Γ'
-        }
-    }
+
 
 
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///users.db'
@@ -63,6 +37,15 @@ class Users(db.Model):
     date_added = db.Column(db.DateTime, default=datetime.now)
 
 	
+class QuestionForm(FlaskForm):
+    question_text= StringField("Email")
+    ans1 = StringField("Name")
+    ans2 = StringField("Phone")
+    ans3 = PasswordField("Password")
+    ans4 = PasswordField("Password")
+    submit = SubmitField("Submit")
+
+
 
 class UserForm(FlaskForm):
     email= StringField("Email", validators=[DataRequired()])
@@ -89,30 +72,23 @@ class Question(db.Model):
     def __repr__(self): #represation 
         return f"{self.question_text}: {self.correct_answer}"
 #---------------------------------------------------------------
-      
-score = 0
-@app.route('/', methods=['GET','POST'])
-def index():
-    global score
-    if request.method == 'POST':
-        form_data = request.form
-        v1 =[key for key in form_data.keys()][0]
-        v2 =[value for value in form_data.values()][0][0]
-        if (v1 == v2):
-            score += 1
-        elif (v1 != 0):
-            score -=1
-    x=random.randint(1,len(questions))
-    question = questions[x]
-    
-    return render_template('index.html', question=question, score=score)
+
+@app.route('/play', methods=['GET','POST'])
+def play():
+    form = QuestionForm()
+    questions = Question.query.all()
+    x = [('answer', 'A')]
+    print(x[0][1])
+    for question in questions:
+        print(question.id, question.question_text, question.option_A, question.option_B, question.option_C, question.option_D, question.correct_answer)
+        return render_template('index.html', question=question, form = form)
+
 
 @app.route('/user/add', methods=['GET', 'POST'])
 def add_user():
     name = None
     form = UserForm()
     if form.validate_on_submit():
-        print('ooooooooooooooooooooo')
    
         user = Users.query.filter_by(email=form.email.data).first()
         if user is None:
@@ -172,7 +148,7 @@ def delete(id):
 		return render_template("add_user.html", 
 		form=form, name=name,our_users=our_users)
      
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     
@@ -181,12 +157,12 @@ def login():
         email = request.form['email']
         pw = request.form['pw']
         if email ==  user.email and pw == user.pw:
-            flash("User Logged in successfully")
-            session['username'] = user.name
-            return render_template('login.html' , form=form, )
+            return redirect(url_for('play'))        
         else:
             flash("Loggin unsuccessful, try again")
-            return render_template('login.html')
+
+   
+    return render_template('login.html', form=form)
         
 
 @app.errorhandler(404)

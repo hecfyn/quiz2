@@ -2,19 +2,38 @@
 {% block content %}
     <br>
     <h1>Quiz Time!</h1>
-    <p> Score:{{ score }}</p>
-    <form action="#" method="post">
-        <div class="question">
-            <p>{{ question['question'] }}</p>
-                    
-            {% for option in question['options'] %}
-                <input type="radio" name="{{ question['correct_answer'] }}" value="{{ option }}"> {{ option }}<br>
-            {% endfor %}
-                    
-        </div>
-        <input type="hidden" id="correct" name="correct" value="{{ question['correct_answer'] }}">
+    
 
-        <input type="submit" value="Submit">
-    </form>
+ 
+    <div class="container">
+        <form method="POST">
+            <!-- Εμφάνιση της ερώτησης -->
+            <div class="form-group">
+                <label>{{ question.question_text }}</label>
+            </div>
+
+            <!-- Εμφάνιση των απαντήσεων ως radio buttons με το Bootstrap -->
+            <div class="form-group">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" id="option_A" name="answer" value="A" required>
+                    <label class="form-check-label" for="option_A">{{ question.option_A }}</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" id="option_B" name="answer" value="B" required>
+                    <label class="form-check-label" for="option_B">{{ question.option_B }}</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" id="option_C" name="answer" value="C" required>
+                    <label class="form-check-label" for="option_C">{{ question.option_C }}</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" id="option_D" name="answer" value="D" required>
+                    <label class="form-check-label" for="option_D">{{ question.option_D }}</label>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-success">Submit</button>
+        </form>
+    </div>
 
 {% endblock %}

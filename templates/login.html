@@ -3,18 +3,18 @@
 {% block content %}
 
 
-	<h1>Loggin</h1><br/>
-	<div class="shadow p-3 mb-5 bg-body rounded">
+	<h1 class = "mt-4">Login</h1><br/>
+	<div class="mt-4 shadow p-3 mb-5 bg-body rounded">
 
 		<form method="POST">
 			{{ form.hidden_tag() }}
 
 			{{ form.email.label(class="form-label") }}
-			{{ form.email(class="form-control", value= name_to_update.email) }}
+			{{ form.email(class="form-control") }}
 			<br/>
 
 			{{ form.pw.label(class="form-label") }}
-			{{ form.pw(class="form-control", value= name_to_update.pw) }}
+			{{ form.pw(class="form-control") }}
 			<br/>
 
 			{{ form.submit(class="btn btn-secondary") }}
