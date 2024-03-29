@@ -1,16 +1,19 @@
 
 import random
 
-from flask import Flask, render_template, flash, request, redirect, url_for
+from flask import Flask, render_template, flash, request, redirect, url_for, session
 from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField, SubmitField
 from wtforms.validators import EqualTo,Email,DataRequired
+from flask import session
 
 from flask_sqlalchemy import SQLAlchemy 
 from datetime import datetime
 
 
 app = Flask(__name__)
+app.secret_key = 'your_secret_key'
+
 
 questions = {
        1: {
@@ -168,6 +171,24 @@ def delete(id):
 		flash("There was a problem deleting user, try again...")
 		return render_template("add_user.html", 
 		form=form, name=name,our_users=our_users)
+     
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    
+    if request.method == 'POST':
+        user = Users.query.get_or_404(form.email)
+        email = request.form['email']
+        pw = request.form['pw']
+        if email ==  user.email and pw == user.pw:
+            flash("User Logged in successfully")
+            session['username'] = user.name
+            return render_template('login.html' , form=form, )
+        else:
+            flash("Loggin unsuccessful, try again")
+            return render_template('login.html')
+        
+
 @app.errorhandler(404)
 def page_not_found(e):    
     return render_template('404.html'), 404
