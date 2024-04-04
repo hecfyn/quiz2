@@ -34,6 +34,7 @@ class Users(db.Model):
     phone = db.Column(db.String(120), nullable=False, unique=True)
     email = db.Column (db.String(200), nullable=False, unique=True)
     pw = db.Column (db.String(200), nullable=False, unique=True)
+    score = db.Column (db.Integer, nullable=False)
     date_added = db.Column(db.DateTime, default=datetime.now)
 
 	
@@ -74,17 +75,26 @@ class Question(db.Model):
 #---------------------------------------------------------------
 
 @app.route('/play', methods=['GET','POST'])
-def play():
+def play(user):
+    
     form = QuestionForm()
     questions = Question.query.all()
-    x = [('answer', 'A')]
-    print(x[0][1])
-    for question in questions:
-        print(question.id, question.question_text, question.option_A, question.option_B, question.option_C, question.option_D, question.correct_answer)
-        return render_template('index.html', question=question, form = form)
+    
+    while(True): 
+        if request.method == 'POST' and form.validate_on_submit():
+            choice = form.choice.data 
+            question = questions[random.randint(0, len(questions)-1)]
+            if choice == question.correct_answer:
+                user.score += 1
+            else:
+                user.score -= 1
+        else:
+            question = questions[random.randint(0, len(questions)-1)]
+            
+        return render_template('index.html', question=question, form=form, score=user.score)
 
 
-@app.route('/user/add', methods=['GET', 'POST'])
+@app.route('/add_user', methods=['GET', 'POST'])
 def add_user():
     name = None
     form = UserForm()
@@ -157,7 +167,7 @@ def login():
         email = request.form['email']
         pw = request.form['pw']
         if email ==  user.email and pw == user.pw:
-            return redirect(url_for('play'))        
+            return redirect(url_for('play'), user=user)        
         else:
             flash("Loggin unsuccessful, try again")
 
