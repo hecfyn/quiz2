@@ -5,10 +5,9 @@ from flask import Flask, render_template, flash, request, redirect, url_for, ses
 from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField, SubmitField
 from wtforms.validators import EqualTo,Email,DataRequired
-from flask import session
-
 from flask_sqlalchemy import SQLAlchemy 
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 app = Flask(__name__)
@@ -70,28 +69,33 @@ class Question(db.Model):
     option_D = db.Column(db.String(100), nullable=False)
     correct_answer = db.Column(db.String(1), nullable=False)
 
-    def __repr__(self): #represation 
-        return f"{self.question_text}: {self.correct_answer}"
+  
 #---------------------------------------------------------------
 
-@app.route('/play', methods=['GET','POST'])
-def play(user):
+@app.route('/play/<int:id>', methods=['GET','POST'])
+def play(id):
+    user = Users.query.get_or_404(id)
     
     form = QuestionForm()
     questions = Question.query.all()
-    
-    while(True): 
-        if request.method == 'POST' and form.validate_on_submit():
-            choice = form.choice.data 
+    c=0
+    while(True):
+        
+        if request.method == 'POST': 
             question = questions[random.randint(0, len(questions)-1)]
-            if choice == question.correct_answer:
-                user.score += 1
-            else:
-                user.score -= 1
+            print(question.correct_answer+ "  oawufg")
+            print(request.form)
+            c=c+1
+            print(c,"---")
+            # if choice == question.correct_answer:
+            #     user.score += 1
+            # else:
+            #     user.score -= 1
         else:
+            
             question = questions[random.randint(0, len(questions)-1)]
             
-        return render_template('index.html', question=question, form=form, score=user.score)
+        return render_template('index.html', question=question, score=user.score, c=c)
 
 
 @app.route('/add_user', methods=['GET', 'POST'])
@@ -163,11 +167,12 @@ def login():
     form = LoginForm()
     
     if request.method == 'POST':
-        user = Users.query.get_or_404(form.email)
+        user = Users.query.filter_by(email=form.email.data).first()
+        print(user)
         email = request.form['email']
         pw = request.form['pw']
         if email ==  user.email and pw == user.pw:
-            return redirect(url_for('play'), user=user)        
+            return redirect(url_for('play', id=user.id))        
         else:
             flash("Loggin unsuccessful, try again")
 
