@@ -78,24 +78,24 @@ def play(id):
     
     form = QuestionForm()
     questions = Question.query.all()
-    c=0
+
     while(True):
         
         if request.method == 'POST': 
             question = questions[random.randint(0, len(questions)-1)]
-            print(question.correct_answer+ "  oawufg")
             print(request.form)
-            c=c+1
-            print(c,"---")
-            # if choice == question.correct_answer:
-            #     user.score += 1
-            # else:
-            #     user.score -= 1
+            print(request.form.getlist('answer')[0])
+
+
+            if request.form.getlist('answer')[1] == request.form.getlist('answer')[0]:
+                user.score += 1
+            elif user.score- 1 >=0 :
+                user.score -= 1
         else:
             
             question = questions[random.randint(0, len(questions)-1)]
             
-        return render_template('index.html', question=question, score=user.score, c=c)
+        return render_template('index.html', question=question, score=user.score, correct = question.correct_answer)
 
 
 @app.route('/add_user', methods=['GET', 'POST'])
@@ -103,11 +103,11 @@ def add_user():
     name = None
     form = UserForm()
     if form.validate_on_submit():
-   
+        
         user = Users.query.filter_by(email=form.email.data).first()
         if user is None:
             
-            user = Users( name=form.name.data, email=form.email.data, phone= form.phone.data , pw = form.pw.data)
+            user = Users( name=form.name.data, phone= form.phone.data ,email=form.email.data,score=0,  pw = form.pw.data)
             db.session.add(user)
             db.session.commit()
             flash("User Added Successfully!")

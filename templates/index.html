@@ -7,7 +7,7 @@
  
     <div class="container">
         <form method="POST">
-            <input type="hidden" name="answer" value="123">
+            <input type="hidden" name="answer" value="{{ correct }}">
             <!-- Εμφάνιση της ερώτησης -->
             <div class="form-group">
                 <label>{{ question.question_text }}</label>
